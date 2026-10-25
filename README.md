@@ -1,60 +1,84 @@
-# 挡路词阅读器 v0.6.1
+# 挡路词阅读器 (Dangluci Reader) v0.6.1
 
-读英文文章时只查挡路的词：点一下给最常用释义，不打断阅读，想留的词一键进生词本。
+> **读英文文章时只查真正挡路的词。**  
+> 点击即出最常用 1–2 个核心释义，绝不打断阅读心流；一键收录生词，智能统计词汇复现。
 
-## 本版已跑通
-- 导入：粘贴文本 / 选择 txt（也支持在文件管理器里“用…打开”txt）
-- 点词查词：点词 → 底部卡片显示音标 + 最常用 1–2 个释义；变形词自动还原（ran → run）
-- 生词本（v0.2 起）：按文章分组，组和组内都按加入时间倒序，可删除；每条保留原句，点开可「回到原文继续读」跳回当初位置并高亮
-- 复现统计（v0.2）：导入时按词头建本地索引；查词卡片一行小字「这个词你已经在 N 篇文章里见过」；生词详情里列出出现过的文章及次数，点文章跳到首次出现处
-- 离线：Manifest 不申请 INTERNET 权限，词库随 APK 打包
-- 阅读进度：按段落 + 偏移保存，重开接着读
+[![GitHub release](https://img.shields.io/badge/release-v0.6.1-blue.svg)](https://github.com/AlbertCamus-cyber/dangluci-reader/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Android](https://img.shields.io/badge/Android-8.0%2B-brightgreen.svg)](https://developer.android.com)
+[![Privacy](https://img.shields.io/badge/Privacy-100%25%20Offline-orange.svg)](#隐私与权限)
 
-## 不做
-整句翻译、账号、云同步、社区、iOS、游戏化、SRS、URL/RSS 抓取。
+---
 
-## 构建
-需要 JDK 17 + Android SDK 34。
-```
-./gradlew assembleDebug
-# 产物: app/build/outputs/apk/debug/app-debug.apk
-```
+## 📱 核心特性
 
-## 代码结构
-```
+- **轻量即时查词**：正文单击单词即在底部弹卡展示音标与最简释义，双击/长按支持查词组；内置词形还原算法（如 `ran` 自动识别为 `run`）。
+- **完全离线运行**：**Manifest 零网络权限（`INTERNET` 权限未申请）**，杜绝任何数据外泄；内置精简版 14MB ECDICT 词典库。
+- **生词本上下文溯源**：生词按文章归档并保留完整原句上下文；在生词详情中一键「回到原文」，瞬间跳转回当初阅读位置并高亮单词。
+- **真实语料复现统计**：导入文章时全自动建立本地词频倒排索引；查词时贴心提示*「这个词你已经在 N 篇文章里见过」*，掌握自己的真实词汇盲区。
+- **深度格式支持**：
+  - 支持直接粘贴纯文本、打开 `.txt` 文本；
+  - 支持 `.epub` 电子书导入（智能按章节自动拆分为阅读文件夹，支持无缝“下一章”）。
+- **数据安全与自定义**：支持本地完整数据备份与恢复、深浅色主题切换、正文字号自适应调节。
+
+---
+
+## 📥 下载安装
+
+可以直接在 [**Releases 页面**](https://github.com/AlbertCamus-cyber/dangluci-reader/releases) 下载最新编译好的安装包：
+
+- 📦 **[下载 dangluci-reader-0.6.1-debug.apk](https://github.com/AlbertCamus-cyber/dangluci-reader/releases/download/v0.6.1/dangluci-reader-0.6.1-debug.apk)** (约 22 MB)
+
+> *系统要求：Android 8.0 (API 26) 及以上系统。*
+
+---
+
+## 🚫 产品设计克制原则（不做事项）
+
+为了保证极致纯粹的沉浸式英语阅读体验，本项目坚决不做以下功能：
+- ❌ 不做整句/全文机器翻译（避免产生阅读惰性）
+- ❌ 不做账号体系与云端同步（保护个人隐私，随时即开即用）
+- ❌ 不做社区社交、排行榜与打卡游戏化机制
+- ❌ 不申请联网权限，不抓取未经清洗的网络 RSS/URL
+
+---
+
+## 🛠️ 项目结构与本地构建
+
+本项目采用手写轻量依赖容器，依赖清晰纯粹：
+
+```text
 app/src/main/java/com/dangluci/reader/
-  ReaderApp.kt / AppContainer.kt   手写依赖容器，换实现只改这里
-  MainActivity.kt                  入口，接收外部 txt
-  data/dict/Dictionary.kt          词典接口 + DictEntry（扩展口：多词典、例句）
-  data/dict/EcdictDictionary.kt    ECDICT 精简库本地 SQLite 查词
-  data/local/UserDb.kt             用户库（文章、进度、生词本），按 VERSION 迁移
-  data/local/ArticleRepository.kt
-  data/local/VocabRepository.kt    生词本，按文章锚定（以后加复习另起表关联 vocab_entries.id）
-  data/local/CorpusRepository.kt   复现统计：occurrences(headword, article_id, count, 首次位置)
-  domain/Tokenizer.kt              分词、取句子、切段落
-  domain/Lemmatizer.kt             查不到时的词形还原兜底
-  ui/AppRoot.kt                    极简栈式导航
-  ui/library  ui/importer  ui/reader  ui/vocab  ui/theme
-tools/build_dict.py                从 ecdict.csv 生成 assets/ecdict_brief.db
+  ├── ReaderApp.kt / AppContainer.kt   // 手写单例依赖容器，解耦各层实现
+  ├── MainActivity.kt                  // 入口 Activity，支持接收外部文件打开意图
+  ├── data/
+  │   ├── dict/                        // 词典引擎：EcdictDictionary 本地 SQLite 查词
+  │   ├── local/                       // Room/SQLite 用户库：文章、进度、生词与复现统计
+  │   └── importer/                    // EPUB 解析与文本清洗器
+  ├── domain/                          // Tokenizer 分词切句、Lemmatizer 词形还原
+  └── ui/                              // Jetpack Compose 现代化界面与沉浸式阅读器
 ```
 
-## 词典与许可证
-词库来自 ECDICT（https://github.com/skywind3000/ECDICT），MIT License，许可证原文在
-`app/src/main/assets/licenses/ECDICT-LICENSE.txt`。精简规则：只保留常用词或有原形信息的词，
-每词最多 2 个词性行、每行 2 个义项，丢弃 [网络] 释义，约 10.4 万词条、7 MB。
-重新生成：`python3 tools/build_dict.py ecdict.csv app/src/main/assets/ecdict_brief.db`，
-并把 `EcdictDictionary.DB_FILE` 的版本号 +1。
+### 编译源码
 
-## 数据库版本
-- v1: articles, vocab
-- v2: articles.indexed；occurrences；vocab → vocab_entries（article_id + paragraph + char_start/end + surface）。旧生词自动迁移，位置记 -1，回跳时按原句定位；旧文章启动时后台补建索引。
-- v3: articles.temporary（临时阅读：不进列表，离开阅读页即删，启动时清理残留）；vocab_entries.from_temp（临时阅读加的生词归「临时阅读」组，不能回跳）
-- v4: folders（一层文件夹，可新建/重命名/删除，删文件夹时文章退回首页）；articles.folder_id
-- v0.5.0: epub 导入（data/importer/Epub.kt，按 spine 抽正文拼成一篇；DRM 书不支持）；正文分段读取避开 CursorWindow 2MB 限制；临时阅读不填标题
-- v0.6.0: 备份导出/恢复（data/Backup.kt）；epub 按章节拆成文件夹（articles.position，DB v5）+ 下一章；字号/主题（data/Settings.kt）；词组查询与「更多释义」（词库 v2 加 full 列和 4.8 万词组）；文章/生词搜索；文章改标题
+源码已包含完整的本地精简词典（`ecdict_brief.db`）与签名配置，拉取后即可一键构建：
 
-## 开源构建说明
-本仓库不包含以下三个二进制文件（推送通道只接受纯文本文件），按下面办法补齐即可构建：
-- 词典数据库 `app/src/main/assets/ecdict_brief.db`：从 ECDICT（https://github.com/skywind3000/ECDICT）取 ecdict.csv，运行 `python3 tools/build_dict.py ecdict.csv app/src/main/assets/ecdict_brief.db` 生成；词典许可证见 `app/src/main/assets/licenses/ECDICT-LICENSE.txt`。
-- `gradle/wrapper/gradle-wrapper.jar`：用系统 Gradle 直接构建，或从 Gradle 官方下载对应版本的 wrapper jar 放入 `gradle/wrapper/`。
-- `keystore/debug.keystore`：构建配置指向 `keystore/debug.keystore`（标准 debug 签名，密码 android）；没有的话用 JDK 的 keytool 生成一个 debug keystore 放到该位置，或把 `~/.android/debug.keystore` 复制过来。
+```bash
+git clone https://github.com/AlbertCamus-cyber/dangluci-reader.git
+cd dangluci-reader
+
+# Linux / macOS
+./gradlew assembleDebug
+
+# Windows
+gradlew.bat assembleDebug
+
+# 构建产物位于: app/build/outputs/apk/debug/app-debug.apk
+```
+
+---
+
+## 📖 词典来源与开源许可
+
+- **本地词库**：基于 [ECDICT](https://github.com/skywind3000/ECDICT)（简明英汉字典增强版）精简构建，采用 MIT License，许可证文本见 `app/src/main/assets/licenses/ECDICT-LICENSE.txt`。
+- **开源协议**：本项目基于 [MIT License](LICENSE) 开源。
