@@ -25,11 +25,12 @@
 
 ## 📥 下载安装
 
-可以直接在 [**Releases 页面**](https://github.com/AlbertCamus-cyber/dangluci-reader/releases) 下载最新编译好的安装包：
+可以直接点击下方链接直接下载仓库内置安装包，或在 Releases 页面获取：
 
-- 📦 **[下载 dangluci-reader-0.6.1-debug.apk](https://github.com/AlbertCamus-cyber/dangluci-reader/releases/download/v0.6.1/dangluci-reader-0.6.1-debug.apk)** (约 22 MB)
+- 📦 **[直接下载 dangluci-reader-0.6.1-debug.apk (仓库直链)](https://github.com/AlbertCamus-cyber/dangluci-reader/raw/main/release/dangluci-reader-0.6.1-debug.apk)** (约 22 MB)
+- 🏷️ **[查看 GitHub Release 标签 (v0.6.1)](https://github.com/AlbertCamus-cyber/dangluci-reader/releases/tag/v0.6.1)**
 
-> *系统要求：Android 8.0 (API 26) 及以上系统。*
+> *系统要求：Android 8.0 (API 26) 及以上系统。安装后开箱即用，无需任何额外配置与网络授权。*
 
 ---
 
